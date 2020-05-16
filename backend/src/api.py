@@ -24,7 +24,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -35,7 +35,15 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    all_drinks = Drink.query.all()
+    drinks = [drink.short() for drink in all_drinks]
 
+    return jsonify({
+        'success':True,
+        'drinks':drinks
+    })
 
 '''
 @TODO implement endpoint
@@ -45,7 +53,18 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks-detail', methods=['GET'])
+@requires_auth('get:drinks-detail')
+def get_drinks_detail():
+    all_drinks = Drink.query.all()
+    drinks = []
+    for drink in all_drinks:
+        drinks.append(drink.long())
+    
+    return jsonify({
+        'success':True,
+        'drinks': drinks
+    })
 
 '''
 @TODO implement endpoint
@@ -56,7 +75,38 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['POST'])
+def add_drink():
+    body = request.get_json()
+    req_title = body.get('title',None)
+    req_recipe = body.get('recipe',None)
 
+    if req_title is None:
+        print('here1')
+        abort(422)
+    if req_recipe is None:
+        print('here2')
+        abort(422)
+    
+    try:
+        # Add new drink to db
+        drink = Drink(title=req_title, recipe=req_recipe)
+        print('here3')
+        drink.insert()
+        print('here4')
+    
+        # Fetch new list of drinks
+        available_drinks = Drink.query.all()
+        drinks = [drink.short() for drink in available_drinks]
+        return jsonify({
+            'success': True,
+            'drinks': drinks
+        })
+    except:
+        return jsonify({
+            'success': False,
+            'message': "The drink is not formatted correctly and can't be shown"
+        })
 
 '''
 @TODO implement endpoint
@@ -90,10 +140,10 @@ Example error handling for unprocessable entity
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
-                    "success": False, 
-                    "error": 422,
-                    "message": "unprocessable"
-                    }), 422
+        "success": False, 
+        "error": 422,
+        "message": "unprocessable"
+    }), 422
 
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
