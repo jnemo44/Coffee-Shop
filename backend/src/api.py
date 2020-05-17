@@ -60,6 +60,7 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_detail():
+    #print(test)
     try:
         all_drinks = Drink.query.all()
         drinks = [drink.long() for drink in all_drinks]
@@ -82,6 +83,7 @@ def get_drinks_detail():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
 def add_drink():
     body = request.get_json()
     req_title = body.get('title',None)
@@ -119,7 +121,7 @@ def add_drink():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks/<int:drink_id>',methods=['PATCH'])
-#@requires_auth('patch:drinks')
+@requires_auth('patch:drinks')
 def edit_drink(drink_id):
     selected_drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     

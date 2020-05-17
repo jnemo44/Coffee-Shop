@@ -51,7 +51,7 @@ def check_permissions(permission, payload):
         raise AuthError({
             'code':'requested_permission_not_allowed',
             'description':'You have requested a permission not allowed'
-        },403)
+        },401)
     
     return True
 
@@ -70,9 +70,9 @@ def check_permissions(permission, payload):
 '''
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
-    print(jsonurl)
+    #print(jsonurl)
     jwks = json.loads(jsonurl.read())
-    print (jwks)
+    #print (jwks)
     unverified_header = jwt.get_unverified_header(token)
     rsa_key = {}
     if 'kid' not in unverified_header:
@@ -145,8 +145,9 @@ def requires_auth(permission=''):
                 abort(401)
 
             check_permissions(permission, payload)
+            print('authenticated')
 
-            return f(payload, *args, **kwargs)
+            return f(*args, **kwargs) #payload, 
 
         return wrapper
     return requires_auth_decorator
