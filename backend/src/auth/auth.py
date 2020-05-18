@@ -142,7 +142,10 @@ def requires_auth(permission=''):
             try:
                 payload = verify_decode_jwt(token)
             except:
-                abort(401)
+                raise AuthError({
+                    'code': 'authorization_header_missing',
+                    'description':'Authorization in header is expected'
+                }, 401)
 
             check_permissions(permission, payload)
             print('authenticated')

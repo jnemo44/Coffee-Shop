@@ -200,7 +200,7 @@ def not_found(error):
 '''
 @app.errorhandler(AuthError)
 def authorization_error(error):
-   return jsonify({
+    return jsonify({
         "success": False, 
         "error": error.status_code,
         "message": error.error['code']
