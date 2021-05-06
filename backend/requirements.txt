@@ -19,6 +19,6 @@ six==1.12.0
 typed-ast
 #Werkzeug==0.15.2
 wrapt==1.11.1
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 sqlalchemy
 flask_sqlalchemy
